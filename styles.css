@@ -11,6 +11,7 @@ body {
     touch-action: none;
     overflow: hidden;
     font-size: 1em;
+    font-weight: bold;
 }
 
 canvas {

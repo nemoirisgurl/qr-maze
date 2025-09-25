@@ -111,7 +111,7 @@ function getGridSize() {
     return Math.floor(Math.min(maxW / mazeCols, maxH / mazeRows));
 }
 GRID_SIZE = getGridSize();
-const PLAYER_SIZE = GRID_SIZE / 1.3;
+let PLAYER_SIZE = GRID_SIZE / 1.4;
 
 // กำหนดขนาด Canvas ให้พอดีกับแผนที่
 
@@ -139,12 +139,10 @@ mazeLayout.forEach((row, y) => {
 });
 const player = { x: startPos.x, y: startPos.y, vx: 0, vy: 0 };
 
-if (savedGame && !savedGame.winTime && savedGame.player) 
-{
+if (savedGame && !savedGame.winTime && savedGame.player) {
     player.x = savedGame.player.x;
     player.y = savedGame.player.y;
 }
-
 
 
 canvas.width = mazeLayout[0].length * GRID_SIZE;
@@ -194,20 +192,18 @@ function isWall(x, y) {
 
 // --- Game Loop และส่วนควบคุมจอยสติ๊ก (เหมือนเดิม) ---
 function update() {
-    if (winTime !== null) {
-        draw();
-        return; // หยุดเกมเมื่อชนะ
-    }
-    let nextX = player.x + player.vx;
-    let nextY = player.y + player.vy;
-    if (!isWall(nextX, nextY) && !isWall(nextX + PLAYER_SIZE, nextY) && !isWall(nextX, nextY + PLAYER_SIZE) && !isWall(nextX + PLAYER_SIZE, nextY + PLAYER_SIZE)) {
-        player.x = nextX;
-        player.y = nextY;
-    }
-    const gridX = Math.floor((player.x + PLAYER_SIZE / 2) / GRID_SIZE);
-    const gridY = Math.floor((player.y + PLAYER_SIZE / 2) / GRID_SIZE);
-    if (mazeLayout[gridY][gridX] === 'E') {
-        winTime = Date.now();
+    if (winTime == null) {
+        let nextX = player.x + player.vx;
+        let nextY = player.y + player.vy;
+        if (!isWall(nextX, nextY) && !isWall(nextX + PLAYER_SIZE, nextY) && !isWall(nextX, nextY + PLAYER_SIZE) && !isWall(nextX + PLAYER_SIZE, nextY + PLAYER_SIZE)) {
+            player.x = nextX;
+            player.y = nextY;
+        }
+        const gridX = Math.floor((player.x + PLAYER_SIZE / 2) / GRID_SIZE);
+        const gridY = Math.floor((player.y + PLAYER_SIZE / 2) / GRID_SIZE);
+        if (mazeLayout[gridY][gridX] === 'E') {
+            winTime = Date.now();
+        }
     }
     draw();
     requestAnimationFrame(update);
@@ -346,7 +342,7 @@ window.addEventListener('resize', () => {
     const gridX = (player.x + PLAYER_SIZE / 2) / GRID_SIZE;
     const gridY = (player.y + PLAYER_SIZE / 2) / GRID_SIZE;
     // อัปเดต PLAYER_SIZE ตาม GRID_SIZE ใหม่
-    PLAYER_SIZE = GRID_SIZE / 1.3;
+    PLAYER_SIZE = GRID_SIZE / 1.4;
     // แปลงกลับมาเป็นพิกัดพิกเซล โดยวางตรงกลางช่อง
     player.x = gridX * GRID_SIZE - PLAYER_SIZE / 2;
     player.y = gridY * GRID_SIZE - PLAYER_SIZE / 2;
