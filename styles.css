@@ -23,3 +23,11 @@ canvas {
     width: 150px;
     height: 150px;
 }
+
+
+@media (max-width: 600px){
+    canvas {
+        width: 50vw;
+        height: auto;
+    }
+}
