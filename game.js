@@ -1,6 +1,7 @@
 // --- ตั้งค่าพื้นฐาน ---
 const canvas = document.getElementById('maze');
 const ctx = canvas.getContext('2d');
+const winningMsg = document.getElementById('winningMsg');
 
 let GRID_SIZE;
 const PLAYER_SPEED = 2.4;
@@ -96,7 +97,7 @@ function generateQRCodeMaze(width, height) {
 }
 
 // เรียกใช้ฟังก์ชันเพื่อสร้างแผนที่
-const mazeLayout = generateQRCodeMaze(MAZE_WIDTH, MAZE_HEIGHT);
+let mazeLayout = generateQRCodeMaze(MAZE_WIDTH, MAZE_HEIGHT);
 
 // --- Responsive Maze Size ---
 function getGridSize() {
@@ -159,7 +160,7 @@ function draw() {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         const seconds = ((winTime - startTime) / 1000).toFixed(2);
-        ctx.fillText(`ชนะ! ใช้เวลา ${seconds} วินาที`, canvas.width / 2, canvas.height / 2);
+        winningMsg.textContent = `คุณชนะ! ใช้เวลา ${seconds} วินาที`;
         ctx.restore();
     }
 }
@@ -194,6 +195,27 @@ function update() {
     draw();
     requestAnimationFrame(update);
 }
+
+function resetMaze() {
+    mazeLayout = generateQRCodeMaze(MAZE_WIDTH, MAZE_HEIGHT);
+    // หา Start จุดใหม่
+    mazeLayout.forEach((row, y) => {
+        row.forEach((cell, x) => {
+            if (cell === 'S') {
+                player.x = x * GRID_SIZE + (GRID_SIZE - PLAYER_SIZE) / 2;
+                player.y = y * GRID_SIZE + (GRID_SIZE - PLAYER_SIZE) / 2;
+                player.vx = 0;
+                player.vy = 0;
+            }
+        });
+    });
+
+    startTime = Date.now();
+    winTime = null;
+    draw();
+}
+
+window.resetMaze = resetMaze;
 const joystick = nipplejs.create({
     zone: document.getElementById('joystickWrapper'),
     mode: 'static',
@@ -230,7 +252,7 @@ update();
 // --- Gyroscope Controls ---
 let gyroEnabled = false;
 let lastGamma = 0, lastBeta = 0;
-const GYRO_SENSITIVITY = 0.045; // ปรับความไว
+const GYRO_SENSITIVITY = 0.08; // ปรับความไว
 
 // ปุ่มเปิด/ปิด gyroscope
 const gyroBtn = document.createElement('button');

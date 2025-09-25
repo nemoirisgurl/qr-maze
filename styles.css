@@ -24,10 +24,16 @@ canvas {
     height: 150px;
 }
 
+button {
+    position: static;
+    top: 20vh;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1000;}
 
-@media (max-width: 600px){
-    canvas {
-        width: 50vw;
-        height: auto;
-    }
-}
+
