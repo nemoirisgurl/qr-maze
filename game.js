@@ -194,12 +194,37 @@ function update() {
     draw();
     requestAnimationFrame(update);
 }
-const joystick = nipplejs.create({ zone: document.getElementById('joystickWrapper'), mode: 'static', position: { left: '50%', top: '50%' }, color: 'white', size: 120 });
-joystick.on('move', (evt, data) => {
-    player.vx = Math.cos(data.angle.radian) * PLAYER_SPEED;
-    player.vy = -Math.sin(data.angle.radian) * PLAYER_SPEED;
+const joystick = nipplejs.create({
+    zone: document.getElementById('joystickWrapper'),
+    mode: 'static',
+    position: { left: '50%', top: '50%' },
+    color: 'white',
+    size: 120
 });
-joystick.on('end', () => { player.vx = 0; player.vy = 0; });
+
+// ใช้ทิศหลัก 4 ทิศ แทนที่จะเป็นการไหลอิสระ
+joystick.on('move', (evt, data) => {
+    const angle = data.angle.degree;
+    if (angle >= 45 && angle < 135) {        // ขึ้น
+        player.vx = 0;
+        player.vy = -PLAYER_SPEED;
+    } else if (angle >= 135 && angle < 225) { // ซ้าย
+        player.vx = -PLAYER_SPEED;
+        player.vy = 0;
+    } else if (angle >= 225 && angle < 315) { // ลง
+        player.vx = 0;
+        player.vy = PLAYER_SPEED;
+    } else {                                 // ขวา
+        player.vx = PLAYER_SPEED;
+        player.vy = 0;
+    }
+});
+
+// ปล่อยจอย → หยุดสนิท
+joystick.on('end', () => {
+    player.vx = 0;
+    player.vy = 0;
+});
 update();
 
 // --- Gyroscope Controls ---
