@@ -8,6 +8,7 @@ const PLAYER_SPEED = 2.4;
 const MAZE_WIDTH = 39;   // เพิ่มขนาด maze
 const MAZE_HEIGHT = 39;  // เพิ่มขนาด maze
 
+
 // --- ฟังก์ชันสร้างแผนที่แบบสุ่ม ---
 function generateQRCodeMaze(width, height) {
     width = width % 2 === 0 ? width + 1 : width;
@@ -97,7 +98,6 @@ function generateQRCodeMaze(width, height) {
 }
 
 // เรียกใช้ฟังก์ชันเพื่อสร้างแผนที่
-let mazeLayout = generateQRCodeMaze(MAZE_WIDTH, MAZE_HEIGHT);
 
 // --- Responsive Maze Size ---
 function getGridSize() {
@@ -111,11 +111,22 @@ function getGridSize() {
     return Math.floor(Math.min(maxW / mazeCols, maxH / mazeRows));
 }
 GRID_SIZE = getGridSize();
-const PLAYER_SIZE = GRID_SIZE / 1.2;
+const PLAYER_SIZE = GRID_SIZE / 1.3;
 
 // กำหนดขนาด Canvas ให้พอดีกับแผนที่
-canvas.width = mazeLayout[0].length * GRID_SIZE;
-canvas.height = mazeLayout.length * GRID_SIZE;
+
+let savedGame = JSON.parse(localStorage.getItem("mazeSave"));
+let mazeLayout, startTime, winTime;
+if (savedGame && !savedGame.winTime) {
+    mazeLayout = savedGame.mazeLayout;
+    startTime = savedGame.startTime;
+    winTime = savedGame.winTime;
+} else {
+    mazeLayout = generateQRCodeMaze(MAZE_WIDTH, MAZE_HEIGHT);
+    startTime = Date.now();
+    winTime = null;
+    console.log("สร้าง maze ใหม่");
+}
 
 // --- ตัวละคร ---
 let startPos = { x: 0, y: 0 };
@@ -128,10 +139,16 @@ mazeLayout.forEach((row, y) => {
 });
 const player = { x: startPos.x, y: startPos.y, vx: 0, vy: 0 };
 
-// --- ตัวแปรจับเวลา ---
-let startTime = Date.now();
-let winTime = null;
+if (savedGame && !savedGame.winTime && savedGame.player) 
+{
+    player.x = savedGame.player.x;
+    player.y = savedGame.player.y;
+}
 
+
+
+canvas.width = mazeLayout[0].length * GRID_SIZE;
+canvas.height = mazeLayout.length * GRID_SIZE;
 // --- ฟังก์ชันวาดภาพ ---
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -212,8 +229,21 @@ function resetMaze() {
 
     startTime = Date.now();
     winTime = null;
+    winningMsg.textContent = '';
+    localStorage.removeItem("mazeSave");
     draw();
 }
+
+function saveGame() {
+    localStorage.setItem("mazeSave", JSON.stringify({
+        mazeLayout,
+        startTime,
+        winTime,
+        player: { x: player.x, y: player.y }
+    }));
+}
+window.addEventListener("beforeunload", saveGame);
+
 
 window.resetMaze = resetMaze;
 const joystick = nipplejs.create({
@@ -252,7 +282,7 @@ update();
 // --- Gyroscope Controls ---
 let gyroEnabled = false;
 let lastGamma = 0, lastBeta = 0;
-const GYRO_SENSITIVITY = 0.08; // ปรับความไว
+const GYRO_SENSITIVITY = 0.045; // ปรับความไว
 
 // ปุ่มเปิด/ปิด gyroscope
 const gyroBtn = document.createElement('button');
@@ -316,7 +346,7 @@ window.addEventListener('resize', () => {
     const gridX = (player.x + PLAYER_SIZE / 2) / GRID_SIZE;
     const gridY = (player.y + PLAYER_SIZE / 2) / GRID_SIZE;
     // อัปเดต PLAYER_SIZE ตาม GRID_SIZE ใหม่
-    PLAYER_SIZE = GRID_SIZE / 1.2;
+    PLAYER_SIZE = GRID_SIZE / 1.3;
     // แปลงกลับมาเป็นพิกัดพิกเซล โดยวางตรงกลางช่อง
     player.x = gridX * GRID_SIZE - PLAYER_SIZE / 2;
     player.y = gridY * GRID_SIZE - PLAYER_SIZE / 2;

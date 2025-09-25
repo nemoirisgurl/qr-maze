@@ -10,6 +10,7 @@ body {
     color: white;
     touch-action: none;
     overflow: hidden;
+    font-size: 1em;
 }
 
 canvas {
@@ -17,6 +18,9 @@ canvas {
     background-color: #fff; /* พื้นที่เกมสีขาว */
 }
 
+#winningMsg {
+    color: #0add08;
+}
 #joystickWrapper {
     position: fixed;
     bottom: 40px;
@@ -34,6 +38,7 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    z-index: 1000;}
-
+    z-index: 1000;
+    margin: 20px auto;
+}
 
