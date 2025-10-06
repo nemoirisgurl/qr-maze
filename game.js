@@ -8,6 +8,22 @@ const PLAYER_SPEED = 2.4;
 const MAZE_WIDTH = 39;   // เพิ่มขนาด maze
 const MAZE_HEIGHT = 39;  // เพิ่มขนาด maze
 
+const socket = new WebSocket("ws://" + window.location.hostname + ":8081");
+
+let lastReset = 0;
+socket.onmessage = event => {
+    const data = JSON.parse(event.data);
+    const dx = data.x / 100;  // จาก -1 ถึง 1
+    const dy = data.y / 100;
+
+    player.vx = dx * PLAYER_SPEED * 16;
+    player.vy = dy * PLAYER_SPEED * 16;
+
+    if (data.sw == 0 && Date.now() - lastReset > 1000) {
+        resetMaze();
+        lastReset = Date.now();
+    }
+};
 
 // --- ฟังก์ชันสร้างแผนที่แบบสุ่ม ---
 function generateQRCodeMaze(width, height) {
